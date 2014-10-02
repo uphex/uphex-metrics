@@ -1,6 +1,6 @@
 require "uphex/metrics/version"
 
-module Uphex
+module UpHex
   module Metrics
     # Your code goes here...
   end
