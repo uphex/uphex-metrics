@@ -1,7 +1,10 @@
 require 'uphex/metrics'
 
 module UpHex::Metrics
-  class TimeSeriesEntry < Struct.new(:date, :value)
+  class TimeSeriesEntry
+    attr_reader :date
+    attr_reader :value
+
     def self.to_time_series_entry(o)
       case o
       when Hash then new(o[:date], o[:value])
@@ -9,6 +12,20 @@ module UpHex::Metrics
       when self then o
       else raise ArgumentError.new("can't make #{self} from #{o.class}")
       end
+    end
+
+    def initialize(date, value)
+      raise ArgumentError.new "not a date" unless date.respond_to?(:utc)
+      @date  = date.utc
+      @value = value
+    end
+
+    def ==(o)
+      o.class == self.class && o.state == self.state
+    end
+
+    def state
+      [@date, @value]
     end
   end
 end

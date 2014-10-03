@@ -28,4 +28,38 @@ describe UpHex::Metrics::TimeSeriesEntry do
       expect(described_class.to_time_series_entry e).to eq e
     end
   end
+
+  describe "#initialize" do
+    it "raises an error for objects that aren't UTC-izable" do
+      expect { described_class.new("2020-01-01", 123) }.to raise_error ArgumentError
+    end
+
+    it "doesn't raise an error for times" do
+      expect { described_class.new(Time.parse('2020-01-01'), 123) }.to_not raise_error
+    end
+
+    it "doesn't raise an error for objects that are UTC-izable" do
+      o = double("date-ish", :utc => "utc date-ish")
+      expect { described_class.new(o, 123) }.to_not raise_error
+    end
+  end
+
+  describe "#==" do
+    let(:date)   { Time.now }
+    let(:value)  { 123 }
+    let(:target) { described_class.new(date, value) }
+
+    it "is not equal for objects of a derived class" do
+      c = Class.new(described_class)
+      expect(target == c.new(date, value)).to be false
+    end
+
+    it "is reflexive" do
+      expect(target == target).to be true
+    end
+
+    it "is equal for instances with identical state" do
+      expect(target == described_class.new(date, value)).to be true
+    end
+  end
 end
