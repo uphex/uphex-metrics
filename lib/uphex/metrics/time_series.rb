@@ -21,5 +21,8 @@ module UpHex::Metrics
         uniq(&:date)
     end
 
+    def by_date
+      @series.group_by { |e| e.date.to_date }.values
+    end
   end
 end
