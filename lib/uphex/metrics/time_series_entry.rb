@@ -1,4 +1,7 @@
 require 'uphex/metrics'
+require 'active_support'
+require 'active_support/core_ext/time'
+require 'active_support/core_ext/date'
 
 module UpHex::Metrics
   class TimeSeriesEntry

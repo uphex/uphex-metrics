@@ -1,5 +1,8 @@
 require 'time'
 require 'forwardable'
+require 'active_support'
+require 'active_support/core_ext/time'
+require 'active_support/core_ext/date'
 require 'uphex/metrics'
 require 'uphex/metrics/time_series_entry'
 
