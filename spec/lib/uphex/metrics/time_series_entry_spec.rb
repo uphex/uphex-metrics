@@ -6,10 +6,10 @@ describe UpHex::Metrics::TimeSeriesEntry do
     it "converts from hashes" do
       t = Time.now
       v = 100
-      raw_hash     = {:date => t, :value => v}
+      raw_hash     = {:time => t, :value => v}
       raw_ts_entry = described_class.to_time_series_entry raw_hash
 
-      expect(raw_ts_entry.date).to eq t
+      expect(raw_ts_entry.time).to eq t
       expect(raw_ts_entry.value).to eq v
     end
 
@@ -19,7 +19,7 @@ describe UpHex::Metrics::TimeSeriesEntry do
       raw_array = [t, v]
       raw_ts_entry = described_class.to_time_series_entry raw_array
 
-      expect(raw_ts_entry.date).to eq t
+      expect(raw_ts_entry.time).to eq t
       expect(raw_ts_entry.value).to eq v
     end
 
@@ -39,19 +39,19 @@ describe UpHex::Metrics::TimeSeriesEntry do
     end
 
     it "doesn't raise an error for objects that are UTC-izable" do
-      o = double("date-ish", :utc => "utc date-ish")
+      o = double("time-ish", :utc => "utc time-ish")
       expect { described_class.new(o, 123) }.to_not raise_error
     end
   end
 
   describe "#==" do
-    let(:date)   { Time.now }
+    let(:time)   { Time.now }
     let(:value)  { 123 }
-    let(:target) { described_class.new(date, value) }
+    let(:target) { described_class.new(time, value) }
 
     it "is not equal for objects of a derived class" do
       c = Class.new(described_class)
-      expect(target == c.new(date, value)).to be false
+      expect(target == c.new(time, value)).to be false
     end
 
     it "is reflexive" do
@@ -59,7 +59,7 @@ describe UpHex::Metrics::TimeSeriesEntry do
     end
 
     it "is equal for instances with identical state" do
-      expect(target == described_class.new(date, value)).to be true
+      expect(target == described_class.new(time, value)).to be true
     end
   end
 end

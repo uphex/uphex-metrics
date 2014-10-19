@@ -5,21 +5,21 @@ require 'active_support/core_ext/date'
 
 module UpHex::Metrics
   class TimeSeriesEntry
-    attr_reader :date
+    attr_reader :time
     attr_reader :value
 
     def self.to_time_series_entry(o)
       case o
-      when Hash then new(o[:date], o[:value])
+      when Hash then new(o[:time], o[:value])
       when Array then new(o[0], o[1])
       when self then o
       else raise ArgumentError.new("can't make #{self} from #{o.class}")
       end
     end
 
-    def initialize(date, value)
-      raise ArgumentError.new "not a date" unless date.respond_to?(:utc)
-      @date  = date.utc
+    def initialize(time, value)
+      raise ArgumentError.new "not a time" unless time.respond_to?(:utc)
+      @time  = time.utc
       @value = value
     end
 
@@ -28,7 +28,7 @@ module UpHex::Metrics
     end
 
     def state
-      [@date, @value]
+      [@time, @value]
     end
   end
 end

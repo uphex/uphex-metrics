@@ -14,12 +14,12 @@ module UpHex::Metrics
     def initialize(array_of_time_series_entries)
       @series = array_of_time_series_entries.
         map { |e| TimeSeriesEntry.to_time_series_entry e }.
-        sort_by(&:date).
-        uniq(&:date)
+        sort_by(&:time).
+        uniq(&:time)
     end
 
     def by_date
-      @series.group_by { |e| e.date.to_date }.values
+      @series.group_by { |e| e.time.to_date }.values
     end
   end
 end
