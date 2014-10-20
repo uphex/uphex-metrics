@@ -24,24 +24,22 @@ describe UpHex::Metrics::TimeSeries do
       UpHex::Metrics::TimeSeriesEntry.to_time_series_entry o
     end
 
+    let(:day_one) { [
+      entry_for([date_for(1, 1), 60]),
+      entry_for([date_for(1, 2), 70]),
+      entry_for([date_for(1, 3), 80]),
+    ] }
+    let(:day_two) { [
+      entry_for([date_for(2, 1), 71]),
+      entry_for([date_for(2, 2), 81]),
+    ] }
+    let(:day_three) { [
+      entry_for([date_for(3, 1), 82]),
+    ] }
+
     it "partitions the series into ordered date chunks" do
-      first = [
-        entry_for([date_for(1, 1), 60]),
-        entry_for([date_for(1, 2), 70]),
-        entry_for([date_for(1, 3), 80]),
-      ]
-
-      second = [
-        entry_for([date_for(2, 1), 71]),
-        entry_for([date_for(2, 2), 81]),
-      ]
-
-      third = [
-        entry_for([date_for(3, 1), 82]),
-      ]
-
-      disordered_series = [*second, *third, *first]
-      ordered_partitioned_series = [[*first], [*second], [*third]]
+      disordered_series = [*day_two, *day_three, *day_one]
+      ordered_partitioned_series = [[*day_one], [*day_two], [*day_three]]
 
       expect(described_class.new(disordered_series).by_date).to \
         eq ordered_partitioned_series
