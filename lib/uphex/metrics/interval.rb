@@ -5,11 +5,13 @@ module UpHex::Metrics
     attr_reader :right_value
 
     def self.for(time_range, left_value, right_value)
+      return nil unless time_range
       return nil if time_range.min == time_range.max
       new time_range, left_value, right_value
     end
 
     def initialize(time_range, left_value, right_value)
+      raise ArgumentError.new("range is nil") unless time_range
       raise ArgumentError.new("range is degenerate") if time_range.min == time_range.max
       @time_range  = time_range
       @left_value  = left_value
