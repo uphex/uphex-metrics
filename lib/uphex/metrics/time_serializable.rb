@@ -5,9 +5,6 @@ module UpHex::Metrics
 
     attr_reader :series
 
-    def_delegators :@series,
-      :each,
-      :size,
-      :last
+    def_delegators :@series, :[], :each, :last, :size
   end
 end
