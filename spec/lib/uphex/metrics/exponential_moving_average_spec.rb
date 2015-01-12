@@ -6,58 +6,50 @@ require "uphex/metrics/time_series"
 describe UpHex::Metrics::ExponentialMovingAverage do
   let(:time_series) { UpHex::Metrics::TimeSeries.new(source_data) }
   let(:ema)         { described_class.new(time_series)}
-  let(:prng)        { Random.new }
-  let(:truth)       { truth_data }
+  let(:model)       { {period_count: 15, interval_ratio: 5} }
   let(:tolerance)   { 0.001 }
 
   describe "#forecast" do
-    it "performs a 15-day EMA with interval ratio 5, a variable number of periods into the future" do
-      forecast_periods = 3
-      # compute EMA on records 0..(5 to 10)
-      range = Range.new(0, 5+prng.rand(5))
-      results = ema.forecast(forecast_periods, :range => range,:model => { :period_count => 15, :interval_ratio => 5})
+    let(:forecast_periods) { 3 }
+    let(:range)            { Range.new(0, 5 + rand(5)) }
+    let(:results)          { ema.forecast(forecast_periods, range: range, model: model) }
 
-      expect(results.length).to eq forecast_periods
-      offset = range.end
+    it { expect(results.size).to eq forecast_periods }
 
-      # only the first projected result will match the test data since the R implementation used all available data
-      # comparison_forecast should match all data, including the range
-      result = results[0]
-      t0 = truth[offset]
+    context "comparing results with truth data" do
+      let(:first_result) { results[0] }
+      let(:truth_value)  { truth_data[range.end][0] }
+      let(:diff)         { (first_result[:forecast] - truth_value).abs / truth_value }
 
-      diff = (result[:forecast] - t0[0]).abs / t0[0]
-
-      expect(diff).to be <= tolerance
+      it { expect(diff).to be <= tolerance }
     end
   end
 
   describe "#forecast_comparison" do
-    it "performs a 15-day EMA with interval ratio 5 via comparison_forecast" do
-      # compute EMA on records 0..(6 to 16)
-      range = 0..15
+    let(:range)              { 0..15 }
+    let(:foreward)           { 5 }
+    let(:expected_forecasts) { time_series.size - range.max - 1 + foreward }
+    let(:results)            { ema.comparison_forecast(foreward, range: range, model: model) }
 
-      foreward = 5
-      expected_forecasts = time_series.size - range.max - 1 + foreward
-      results = ema.comparison_forecast(foreward, :range => range, :model => {:period_count => 15, :interval_ratio => 5})
-      expect(results.size).to eq expected_forecasts
+    it { expect(results.size).to eq expected_forecasts }
 
-      offset = range.max + 1
+    describe "comparing results with truth data" do
+      let(:offset) { range.max + 1 }
 
-      # only compare forecasts against truthdata
-      # we'll have ``foreward`` extra results at the end with nothing to compare against
-      results.each_with_index do |r, index|
-        # we have nothing to compare our forecasts beyond time_series.size to, so we skip them
-        break if index+offset >= time_series.size
+      it do
+        results.each_with_index do |result, i|
+          break if i + offset >= time_series.size
 
-        t = truth[offset + index ]
-        diff = (r[:forecast] - t[0]).abs / t[0]
-        expect(diff).to be <= tolerance
+          t = truth_data[offset + i]
+          diff = (result[:forecast] - t[0]).abs / t[0]
+          expect(diff).to be <= tolerance
 
-        diff = (r[:low] - t[1]).abs / t[1]
-        expect(diff).to be <= tolerance
+          diff = (result[:low] - t[1]).abs / t[1]
+          expect(diff).to be <= tolerance
 
-        diff = (r[:high] - t[2]).abs / t[2]
-        expect(diff).to be <= tolerance
+          diff = (result[:high] - t[2]).abs / t[2]
+          expect(diff).to be <= tolerance
+        end
       end
     end
   end
