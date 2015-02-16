@@ -16,8 +16,8 @@ describe UpHex::Metrics::AutoregressiveIntegratedMovingAverage do
       result = described_class.new(series).forecast
 
       expect(result[:forecast]).to be_between(29, 31)
-      expect(result[:low]     ).to eq(29.6654443738)
-      expect(result[:high]    ).to eq(30.515821675)
+      expect(result[:low]     ).to be_between(29, 30)
+      expect(result[:high]    ).to be_between(30, 31)
     end
   end
 end
