@@ -1,4 +1,5 @@
 require "open3"
+require "active_support/core_ext/integer/time"
 
 module UpHex
   module Metrics
