@@ -1,29 +1,16 @@
-# Uphex::Metrics
+# UpHex::Metrics
 
-TODO: Write a gem description
+`UpHex::Metrics` depend on the `statsmodels` Python package.
 
-## Installation
+To have `statsmodels` available on Ubuntu, first install the apt packages required to build it:
 
-Add this line to your application's Gemfile:
+```
+sudo apt-get install build-essential gfortran g++ liblapack-dev libblas-dev python python-pip
+```
 
-    gem 'uphex-metrics'
+Now install `numpy` and `statsmodels`:
 
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install uphex-metrics
-
-## Usage
-
-TODO: Write usage instructions here
-
-## Contributing
-
-1. Fork it ( https://github.com/[my-github-username]/uphex-metrics/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+```
+sudo pip2 install --upgrade numpy
+sudo pip2 install --upgrade statsmodels
+```
