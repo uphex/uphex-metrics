@@ -187,21 +187,6 @@ def readTextFile(metric,filename="observations.csv"):
     #print d
     return d
 
-class redirect_streams(object):
-    def __init__(self, stdout=None, stderr=None):
-        self._stdout = stdout or sys.stdout
-        self._stderr = stderr or sys.stderr
-
-    def __enter__(self):
-        self.old_stdout, self.old_stderr = sys.stdout, sys.stderr
-        self.old_stdout.flush(); self.old_stderr.flush()
-        sys.stdout, sys.stderr = self._stdout, self._stderr
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self._stdout.flush(); self._stderr.flush()
-        sys.stdout = self.old_stdout
-        sys.stderr = self.old_stderr
-
 if __name__ == "__main__":
     input_values = [float(x) for x in sys.stdin.readline().strip().split()]
     input_points = list(range(0, len(input_values)))
