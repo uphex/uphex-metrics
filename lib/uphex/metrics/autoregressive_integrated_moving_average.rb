@@ -1,5 +1,6 @@
-require "open3"
-require "active_support/core_ext/integer/time"
+require "json"
+require "net/http"
+require "uri"
 
 module UpHex
   module Metrics
@@ -9,21 +10,26 @@ module UpHex
       end
 
       def forecast
-        path = File.expand_path("../../../../lib_python/autoregressive_integrated_moving_average.py", __FILE__)
+        series   = @time_series.series.map(&:value).join(" ") + "\n"
+        response = request(series)
+        data     = JSON.parse(response)
 
-        raise "Couldn't find Python script" unless File.exist?(path)
+        {time: @time_series.last.time.since(1.day), forecast: data["forecast"], low: data["low"], high: data["high"]}
+      rescue JSON::ParserError => e
+        raise "Couldn't run prediction (#{response})"
+      end
 
-        stdin, stdout, stderr, _wait = Open3.popen3("python2 #{path}")
+      private
 
-        stdin << @time_series.series.map(&:value).join(" ") + "\n"
+      def request(data)
+        uri     = URI.parse(ENV.fetch("PREDICTION_SERVICE_URL", "http://localhost:5000"))
+        http    = Net::HTTP.new(uri.host, uri.port)
+        request = Net::HTTP::Post.new(uri.request_uri)
 
-        if (output = stdout.read.strip).empty?
-          raise stderr.read
-        else
-          forecast, low, high = output.split.map(&:to_f)
+        request.body = data
+        request["Content-Type"] = "text/plain"
 
-          {time: @time_series.last.time.since(1.day), forecast: forecast, low: low, high: high}
-        end
+        http.request(request).body
       end
     end
   end
