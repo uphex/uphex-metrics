@@ -8,22 +8,16 @@ describe UpHex::Metrics::AutoregressiveIntegratedMovingAverage do
   let(:arima)       { described_class.new(time_series)}
 
   describe "#forecast" do
-    let(:data) { reps.times.map { |i| [Time.now + i, 73] } }
+    let(:data) { 4.times.map { |i| [Time.now - 4 + i, (i+1) * 10] } }
 
-    context "with 19 observations" do
-      let(:reps) { 19 }
-
-      it { expect(arima.forecast[:forecast]).to be_between(72.9, 73.1) }
-      it { expect(arima.forecast[:high]).to be < 73.1 }
-      it { expect(arima.forecast[:low]).to be > 72.9 }
+    before do
+      expect(arima)
+        .to receive(:request).with("10 20 30 40\n")
+        .and_return(%|{"high": 50.00000001959944, "low": 49.99999998040056, "forecast": 50.0}|)
     end
 
-    context "with 20 observations" do
-      let(:reps) { 20 }
-
-      it { expect(arima.forecast[:forecast]).to be_between(72.9, 73.1) }
-      it { expect(arima.forecast[:high]).to be < 73.1 }
-      it { expect(arima.forecast[:low]).to be > 72.9 }
-    end
+    it { expect(arima.forecast[:forecast]).to eq 50.0 }
+    it { expect(arima.forecast[:high]).to eq 50.00000001959944 }
+    it { expect(arima.forecast[:low]).to eq 49.99999998040056 }
   end
 end
