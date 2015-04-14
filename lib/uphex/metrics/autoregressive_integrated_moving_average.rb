@@ -16,7 +16,7 @@ module UpHex
 
         {time: @time_series.last.time.advance(days: 1), forecast: data["forecast"], low: data["low"], high: data["high"]}
       rescue JSON::ParserError => e
-        raise "Couldn't run prediction (#{response})"
+        raise "Couldn't run prediction (#{response}) from series [#{series}]"
       end
 
       private
